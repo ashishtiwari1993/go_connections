@@ -1,56 +1,55 @@
 package connections
 
 import (
-	"fmt"
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
-	"os"
-	"encoding/json"
-	"io/ioutil"
-	"strconv"
 	log "github.com/sirupsen/logrus"
-	"runtime"
+	"io/ioutil"
+	"os"
 	"path"
+	"runtime"
+	"strconv"
 )
 
 var configs map[string]string
 
-func init(){
+func init() {
 	loadConf()
 }
 
-func loadConf(){
+func loadConf() {
 
 	// ================ Read 'configs.json' file =========
 	_, filename, _, _ := runtime.Caller(1)
 	configFile := path.Join(path.Dir(filename), "/configs.json")
-	jsonFile, err := os.Open(configFile);
-    if err != nil {
-        fmt.Println(err)
-    }
+	jsonFile, err := os.Open(configFile)
+	if err != nil {
+		fmt.Println(err)
+	}
 	defer jsonFile.Close()
-    byteValue, _ := ioutil.ReadAll(jsonFile)
-    json.Unmarshal([]byte(byteValue), &configs)
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	json.Unmarshal([]byte(byteValue), &configs)
 
 	// ================ Read 'configs.json' file End =====
 
 	// ======== Define logs info =========================
 
-    f, err := os.OpenFile(configs["LOG_FILE_PATH"], os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-    log.SetReportCaller(true)
-    log.SetFormatter(&log.JSONFormatter{})
-    log.SetLevel(log.InfoLevel)
+	f, err := os.OpenFile(configs["LOG_FILE_PATH"], os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	log.SetReportCaller(true)
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetLevel(log.InfoLevel)
 
-    if err != nil {
-        fmt.Println(err.Error() + " : " + configs["LOG_FILE_PATH"])
-    }else{
-        log.SetOutput(f)
-    }
+	if err != nil {
+		fmt.Println(err.Error() + " : " + configs["LOG_FILE_PATH"])
+	} else {
+		log.SetOutput(f)
+	}
 
 	// ======== Define Logs End ==========================
 }
-
 
 func ConnectRedis() *redis.Client {
 
@@ -59,7 +58,7 @@ func ConnectRedis() *redis.Client {
 	rd := redis.NewClient(&redis.Options{
 		Addr:     c,
 		Password: configs["REDIS_PASS"], // no password set
-		DB:       0,         // use default DB
+		DB:       0,                     // use default DB
 	})
 
 	res, err := rd.Ping().Result()
