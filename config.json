@@ -1,0 +1,11 @@
+{
+    "REDIS_HOST":"localhost",
+    "REDIS_PORT":"6379",
+    "REDIS_AUTH":"",
+    "MYSQL_HOST":"localhost",
+    "MYSQL_USER":"root",
+    "MYSQL_PASS":"sdf45s46df",
+	"MYSQL_DB":"TEST",
+    "MYSQL_NOCONN":"10",
+	"LOG_FILE_PATH":"/tmp/connection.log"
+}
