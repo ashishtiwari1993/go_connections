@@ -1,4 +1,4 @@
-package connection
+package connections
 
 import (
 	"fmt"
@@ -10,10 +10,11 @@ import (
 	"io/ioutil"
 	"strconv"
 	log "github.com/sirupsen/logrus"
+	"runtime"
+	"path"
 )
 
 var configs map[string]string
-var configFile string =  "config.json"
 
 func init(){
 	loadConf()
@@ -21,6 +22,9 @@ func init(){
 
 func loadConf(){
 
+	// ================ Read 'configs.json' file =========
+	_, filename, _, _ := runtime.Caller(1)
+	configFile := path.Join(path.Dir(filename), "/configs.json")
 	jsonFile, err := os.Open(configFile);
     if err != nil {
         fmt.Println(err)
@@ -29,15 +33,22 @@ func loadConf(){
     byteValue, _ := ioutil.ReadAll(jsonFile)
     json.Unmarshal([]byte(byteValue), &configs)
 
-//  Define logging info
+	// ================ Read 'configs.json' file End =====
 
-    f, _ := os.OpenFile(configs["LOG_FILE_PATH"], os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-    log.SetOutput(f)
+	// ======== Define logs info =========================
+
+    f, err := os.OpenFile(configs["LOG_FILE_PATH"], os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
     log.SetReportCaller(true)
     log.SetFormatter(&log.JSONFormatter{})
     log.SetLevel(log.InfoLevel)
 
+    if err != nil {
+        fmt.Println(err.Error() + " : " + configs["LOG_FILE_PATH"])
+    }else{
+        log.SetOutput(f)
+    }
 
+	// ======== Define Logs End ==========================
 }
 
 
@@ -47,18 +58,24 @@ func ConnectRedis() *redis.Client {
 
 	rd := redis.NewClient(&redis.Options{
 		Addr:     c,
-		Password: configs["REDIS_AUTH"], // no password set
+		Password: configs["REDIS_PASS"], // no password set
 		DB:       0,         // use default DB
 	})
 
 	res, err := rd.Ping().Result()
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.WithFields(log.Fields{
+			"REDIS_HOST": configs["REDIS_HOST"],
+			"REDIS_PORT": configs["REDIS_PORT"],
+		}).Fatal(err.Error())
 	}
 
 	if res != "PONG" {
-		log.Fatal("Invalid Redis Password")
+		log.WithFields(log.Fields{
+			"REDIS_HOST": configs["REDIS_HOST"],
+			"REDIS_PORT": configs["REDIS_PORT"],
+		}).Fatal("Invalid Redis Password")
 	}
 
 	return rd
@@ -71,7 +88,6 @@ func ConnectMysql() *sql.DB {
 	err = db.Ping()
 
 	if err != nil {
-		log.Error("Exit. Cannot make connection with host: '" + configs["MYSQL_HOST"] + "' user: '" + configs["MYSQL_USER"] + "' pass: '" + configs["MYSQL_PASS"] + "' database: '" + configs["MYSQL_DB"] + "'")
 		log.Fatal(err.Error())
 	}
 
