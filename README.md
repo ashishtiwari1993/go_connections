@@ -16,7 +16,13 @@ package main
 
 import c "YourProjectPath/go_connections"
 
+var configs map[string]string
+
 func main() {
+
+	// Access all value of configs.json
+	configs = c.Configs
+	
 	m := c.ConnectMysql()
 	m.Close()
 	
