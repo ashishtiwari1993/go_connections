@@ -14,7 +14,7 @@ import (
 	"strconv"
 )
 
-var configs map[string]string
+var Configs map[string]string
 
 func init() {
 	loadConf()
@@ -22,7 +22,7 @@ func init() {
 
 func loadConf() {
 
-	// ================ Read 'configs.json' file =========
+	// ================ Read 'Configs.json' file =========
 	_, filename, _, _ := runtime.Caller(1)
 	configFile := path.Join(path.Dir(filename), "/configs.json")
 	jsonFile, err := os.Open(configFile)
@@ -31,19 +31,19 @@ func loadConf() {
 	}
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	json.Unmarshal([]byte(byteValue), &configs)
+	json.Unmarshal([]byte(byteValue), &Configs)
 
-	// ================ Read 'configs.json' file End =====
+	// ================ Read 'Configs.json' file End =====
 
 	// ======== Define logs info =========================
 
-	f, err := os.OpenFile(configs["LOG_FILE_PATH"], os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	f, err := os.OpenFile(Configs["LOG_FILE_PATH"], os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	log.SetReportCaller(true)
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetLevel(log.InfoLevel)
 
 	if err != nil {
-		fmt.Println(err.Error() + " : " + configs["LOG_FILE_PATH"])
+		fmt.Println(err.Error() + " : " + Configs["LOG_FILE_PATH"])
 	} else {
 		log.SetOutput(f)
 	}
@@ -53,11 +53,11 @@ func loadConf() {
 
 func ConnectRedis() *redis.Client {
 
-	c := configs["REDIS_HOST"] + ":" + configs["REDIS_PORT"]
+	c := Configs["REDIS_HOST"] + ":" + Configs["REDIS_PORT"]
 
 	rd := redis.NewClient(&redis.Options{
 		Addr:     c,
-		Password: configs["REDIS_PASS"], // no password set
+		Password: Configs["REDIS_PASS"], // no password set
 		DB:       0,                     // use default DB
 	})
 
@@ -65,15 +65,15 @@ func ConnectRedis() *redis.Client {
 
 	if err != nil {
 		log.WithFields(log.Fields{
-			"REDIS_HOST": configs["REDIS_HOST"],
-			"REDIS_PORT": configs["REDIS_PORT"],
+			"REDIS_HOST": Configs["REDIS_HOST"],
+			"REDIS_PORT": Configs["REDIS_PORT"],
 		}).Fatal(err.Error())
 	}
 
 	if res != "PONG" {
 		log.WithFields(log.Fields{
-			"REDIS_HOST": configs["REDIS_HOST"],
-			"REDIS_PORT": configs["REDIS_PORT"],
+			"REDIS_HOST": Configs["REDIS_HOST"],
+			"REDIS_PORT": Configs["REDIS_PORT"],
 		}).Fatal("Invalid Redis Password")
 	}
 
@@ -82,18 +82,26 @@ func ConnectRedis() *redis.Client {
 
 func ConnectMysql() *sql.DB {
 
-	conn := configs["MYSQL_USER"] + ":" + configs["MYSQL_PASS"] + "@tcp(" + configs["MYSQL_HOST"] + ":" + configs["MYSQL_PORT"] + ")/" + configs["MYSQL_DB"]
+	conn := Configs["MYSQL_USER"] + ":" + Configs["MYSQL_PASS"] + "@tcp(" + Configs["MYSQL_HOST"] + ":" + Configs["MYSQL_PORT"] + ")/" + Configs["MYSQL_DB"]
 	db, err := sql.Open("mysql", conn)
 	err = db.Ping()
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.WithFields(log.Fields{
+			"MYSQL_HOST":Configs["MYSQL_HOST"],
+			"MYSQL_USER":Configs["MYSQL_USER"],
+			"MYSQL_DB":Configs["MYSQL_DB"],
+		}).Fatal(err.Error())
 	}
 
-	no_conn, err := strconv.Atoi(configs["MYSQL_NOCONN"])
+	no_conn, err := strconv.Atoi(Configs["MYSQL_NOCONN"])
 
 	if err != nil {
-		log.Fatal(err.Error())
+		log.WithFields(log.Fields{
+			"MYSQL_HOST":Configs["MYSQL_HOST"],
+			"MYSQL_USER":Configs["MYSQL_USER"],
+			"MYSQL_DB":Configs["MYSQL_DB"],
+		}).Fatal(err.Error())
 	}
 
 	db.SetMaxIdleConns(no_conn)
