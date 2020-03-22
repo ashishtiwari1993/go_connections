@@ -5,8 +5,8 @@
     "MYSQL_HOST":"localhost",
     "MYSQL_USER":"root",
     "MYSQL_PASS":"mysql_pass",
-	"MYSQL_PORT":"3306",
-	"MYSQL_DB":"db",
+    "MYSQL_PORT":"3306",
+    "MYSQL_DB":"db",
     "MYSQL_NOCONN":"10",
-	"LOG_FILE_PATH":"/tmp/connections.log"
+    "LOG_FILE_PATH":"/tmp/connections.log"
 }
