@@ -6,6 +6,9 @@ A central library that contains different functions for different connections li
 ## git clone
 `git clone https://github.com/ashishtiwari1993/go_connections.git`
 
+## Install all dependency
+`go get ./...`
+
 ## Set configs in `configs.json`
 `vim go_connections/configs.json`
 
