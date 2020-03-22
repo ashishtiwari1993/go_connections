@@ -88,9 +88,9 @@ func ConnectMysql() *sql.DB {
 
 	if err != nil {
 		log.WithFields(log.Fields{
-			"MYSQL_HOST":Configs["MYSQL_HOST"],
-			"MYSQL_USER":Configs["MYSQL_USER"],
-			"MYSQL_DB":Configs["MYSQL_DB"],
+			"MYSQL_HOST": Configs["MYSQL_HOST"],
+			"MYSQL_USER": Configs["MYSQL_USER"],
+			"MYSQL_DB":   Configs["MYSQL_DB"],
 		}).Fatal(err.Error())
 	}
 
@@ -98,9 +98,9 @@ func ConnectMysql() *sql.DB {
 
 	if err != nil {
 		log.WithFields(log.Fields{
-			"MYSQL_HOST":Configs["MYSQL_HOST"],
-			"MYSQL_USER":Configs["MYSQL_USER"],
-			"MYSQL_DB":Configs["MYSQL_DB"],
+			"MYSQL_HOST": Configs["MYSQL_HOST"],
+			"MYSQL_USER": Configs["MYSQL_USER"],
+			"MYSQL_DB":   Configs["MYSQL_DB"],
 		}).Fatal(err.Error())
 	}
 
