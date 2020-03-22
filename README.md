@@ -17,7 +17,10 @@ package main
 import c "YourProjectPath/go_connections"
 
 func main() {
-	c.ConnectMysql()
-	c.ConnectRedis()
+	m := c.ConnectMysql()
+	m.Close()
+	
+	r := c.ConnectRedis()
+	r.Close()
 }
 ```
